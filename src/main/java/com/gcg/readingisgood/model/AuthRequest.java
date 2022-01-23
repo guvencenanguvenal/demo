@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -14,8 +15,10 @@ import javax.validation.constraints.NotNull;
 public class AuthRequest {
 
     @NotNull
+    @NotEmpty
     private String username;
     @NotNull
+    @NotEmpty
     private String password;
 
 }

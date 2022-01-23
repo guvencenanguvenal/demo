@@ -1,8 +1,6 @@
 package com.gcg.readingisgood.controller.v1.api;
 
 import com.gcg.readingisgood.controller.v1.model.request.CreateOrderRequest;
-import com.gcg.readingisgood.exception.EntityType;
-import com.gcg.readingisgood.exception.ExceptionType;
 import com.gcg.readingisgood.model.Response;
 import com.gcg.readingisgood.model.dto.BookDTO;
 import com.gcg.readingisgood.model.dto.CustomerDTO;
@@ -11,18 +9,19 @@ import com.gcg.readingisgood.service.BookService;
 import com.gcg.readingisgood.service.CustomerService;
 import com.gcg.readingisgood.service.OrderService;
 import com.gcg.readingisgood.util.DateUtil;
-import com.gcg.readingisgood.util.ExceptionUtil;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/order")
+@Validated
 public class OrderController {
 
     @Autowired
@@ -55,12 +54,12 @@ public class OrderController {
     }
 
     @GetMapping(params = "id")
-    public Response getOrderById(@Valid @NotNull @RequestParam("id") String id) {
+    public Response getOrderById(@NotNull @NotEmpty @RequestParam("id") String id) {
         return Response.ok().setPayload(orderService.getOrderById(id));
     }
 
     @GetMapping(params = {"from", "to"})
-    public Response getOrderByIntervalDate(@Valid @NotNull @RequestParam("from") @DateTimeFormat(pattern="yyyy-MM-dd") Date from, @Valid @NotNull @RequestParam("to") @DateTimeFormat(pattern="yyyy-MM-dd") Date to) {
+    public Response getOrderByIntervalDate(@NotNull @RequestParam("from") @DateTimeFormat(pattern="yyyy-MM-dd") Date from, @NotNull @RequestParam("to") @DateTimeFormat(pattern="yyyy-MM-dd") Date to) {
         return Response.ok().setPayload(orderService.getOrdersByIntervalDate(from, to));
     }
 

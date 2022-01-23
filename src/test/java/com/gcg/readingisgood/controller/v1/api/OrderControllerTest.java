@@ -5,13 +5,11 @@ import com.gcg.readingisgood.model.Response;
 import com.gcg.readingisgood.model.dto.BookDTO;
 import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.model.dto.OrderDTO;
-import com.gcg.readingisgood.model.repository.Book;
-import com.gcg.readingisgood.repository.OrderRepository;
 import com.gcg.readingisgood.service.BookService;
 import com.gcg.readingisgood.service.CustomerService;
 import com.gcg.readingisgood.service.OrderService;
-import com.gcg.readingisgood.service.OrderServiceImpl;
 import com.gcg.readingisgood.util.DateUtil;
+import com.gcg.readingisgood.util.MapperUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -50,7 +47,7 @@ public class OrderControllerTest {
     private BookService bookService;
 
     @Mock
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @Before
     public void before(){

@@ -7,8 +7,8 @@ import com.gcg.readingisgood.model.dto.OrderDTO;
 import com.gcg.readingisgood.model.repository.Order;
 import com.gcg.readingisgood.repository.OrderRepository;
 import com.gcg.readingisgood.util.ExceptionUtil;
+import com.gcg.readingisgood.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,17 +24,17 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
     @Autowired
-    BookService bookService;
+    private BookService bookService;
 
     @Autowired
-    ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @Override
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream().map(element -> modelMapper.map(element, OrderDTO.class)).collect(Collectors.toList());
+        return orderRepository.findAll().stream().map(element -> mapperUtil.map(element, OrderDTO.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -43,10 +43,12 @@ public class OrderServiceImpl implements OrderService {
 
         if (bookService.checkStock(orderDTO.getBook().getIsbn()))
             bookService.updateStock(orderDTO.getBook().getIsbn(), orderDTO.getBook().getStock() - 1);
-        else
+        else {
+            log.error(orderDTO.getBook().getIsbn() + " - book stock not found!");
             throw ExceptionUtil.throwException(EntityType.ORDER, ExceptionType.ENTITY_NOT_FOUND, "Book stock not found!");
+        }
 
-        return modelMapper.map(orderRepository.save(modelMapper.map(orderDTO, Order.class)), OrderDTO.class);
+        return mapperUtil.map(orderRepository.save(mapperUtil.map(orderDTO, Order.class)), OrderDTO.class);
     }
 
     @Override
@@ -55,8 +57,10 @@ public class OrderServiceImpl implements OrderService {
         Optional<Order> order = orderRepository.findById(id);
 
         if (order.isPresent()) {
-            return modelMapper.map(order.get(), OrderDTO.class);
+            return mapperUtil.map(order.get(), OrderDTO.class);
         }
+
+        log.error(id + " - order not found!");
 
         throw ExceptionUtil.throwException(EntityType.ORDER, ExceptionType.ENTITY_NOT_FOUND, id);
 
@@ -71,17 +75,19 @@ public class OrderServiceImpl implements OrderService {
 
         if (orders.isPresent() && orders.get().size() != 0) {
             for (Order order : orders.get()) {
-                response.add(modelMapper.map(order, OrderDTO.class));
+                response.add(mapperUtil.map(order, OrderDTO.class));
             }
 
             return response;
         }
+
+        log.error(customerId + " - customer not found!");
 
         throw ExceptionUtil.throwException(EntityType.ORDER, ExceptionType.ENTITY_NOT_FOUND, customerId);
     }
 
     @Override
     public List<OrderDTO> getOrdersByIntervalDate(Date from, Date to) {
-        return orderRepository.findByOrderDateBetween(from, to).stream().map(element -> modelMapper.map(element, OrderDTO.class)).collect(Collectors.toList());
+        return orderRepository.findByOrderDateBetween(from, to).stream().map(element -> mapperUtil.map(element, OrderDTO.class)).collect(Collectors.toList());
     }
 }

@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -14,12 +16,17 @@ import javax.validation.constraints.NotNull;
 public class CreateCustomerRequest {
 
     @NotNull
+    @NotEmpty
+    @Email
     private String email;
     @NotNull
+    @NotEmpty
     private String name;
     @NotNull
+    @NotEmpty
     private String surname;
     @NotNull
+    @NotEmpty
     private String password;
 
 }

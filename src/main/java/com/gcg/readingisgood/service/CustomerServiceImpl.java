@@ -6,11 +6,12 @@ import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.model.repository.Customer;
 import com.gcg.readingisgood.repository.CustomerRepository;
 import com.gcg.readingisgood.util.ExceptionUtil;
+import com.gcg.readingisgood.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,14 +26,17 @@ public class CustomerServiceImpl implements CustomerService {
     private CustomerRepository customerRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
+
+    @Autowired
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public List<CustomerDTO> getAllCustomers(Integer page, Integer size) {
 
         Page<Customer> customerPage = customerRepository.findAll(PageRequest.of(page, size));
 
-        return customerPage.getContent().stream().map(element -> modelMapper.map(element, CustomerDTO.class)).collect(Collectors.toList());
+        return customerPage.getContent().stream().map(element -> mapperUtil.map(element, CustomerDTO.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -41,8 +45,10 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> customer = Optional.ofNullable(customerRepository.findByEmail(email));
 
         if (customer.isPresent()){
-            return modelMapper.map(customer.get(), CustomerDTO.class);
+            return mapperUtil.map(customer.get(), CustomerDTO.class);
         }
+
+        log.error(email + " - customer not found!");
 
         throw ExceptionUtil.throwException(EntityType.USER, ExceptionType.ENTITY_NOT_FOUND, email);
     }
@@ -52,8 +58,10 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customer> customer = customerRepository.findById(id);
 
         if (customer.isPresent()){
-            return modelMapper.map(customer.get(), CustomerDTO.class);
+            return mapperUtil.map(customer.get(), CustomerDTO.class);
         }
+
+        log.error(id + " - customer not found!");
 
         throw ExceptionUtil.throwException(EntityType.USER, ExceptionType.ENTITY_NOT_FOUND, id);
     }
@@ -68,10 +76,14 @@ public class CustomerServiceImpl implements CustomerService {
                     .setEmail(customerDTO.getEmail())
                     .setName(customerDTO.getName())
                     .setSurname(customerDTO.getSurname())
-                    .setPassword(customerDTO.getPassword());
+                    .setPassword(bCryptPasswordEncoder.encode(customerDTO.getPassword()));
 
-            return modelMapper.map(customerRepository.save(customer), CustomerDTO.class);
+            log.info(customer.toString() + " - new customer! ");
+
+            return mapperUtil.map(customerRepository.save(customer), CustomerDTO.class);
         }
+
+        log.error(customerDTO.toString() + " - customer duplicate!");
 
         throw ExceptionUtil.throwException(EntityType.USER, ExceptionType.DUPLICATE_ENTITY, customerDTO.getEmail());
 

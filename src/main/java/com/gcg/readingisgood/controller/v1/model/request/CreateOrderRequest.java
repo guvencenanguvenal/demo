@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.ISBN;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -16,9 +18,12 @@ import java.util.List;
 public class CreateOrderRequest {
 
     @NotNull
+    @NotEmpty
+    //@ISBN
     private String isbn;
 
     @NotNull
+    @NotEmpty
     private String customerEmail;
 
 }

@@ -3,6 +3,7 @@ package com.gcg.readingisgood.service;
 import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.model.repository.Customer;
 import com.gcg.readingisgood.repository.CustomerRepository;
+import com.gcg.readingisgood.util.MapperUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -34,7 +35,10 @@ public class CustomerServiceImplTest {
     private CustomerRepository customerRepository;
 
     @Mock
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
+
+    @Mock
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Before
     public void before(){
@@ -60,7 +64,7 @@ public class CustomerServiceImplTest {
                 .setOrders(null);
 
         Mockito.when(customerRepository.findByEmail(INPUT_EMAIL)).thenReturn(customer);
-        Mockito.when(modelMapper.map(customer, CustomerDTO.class)).thenReturn(customerDTO);
+        Mockito.when(mapperUtil.map(customer, CustomerDTO.class)).thenReturn(customerDTO);
 
         CustomerDTO response = customerService.getCustomerByEmail(INPUT_EMAIL);
         Assert.assertEquals(customerDTO, response);
@@ -86,7 +90,7 @@ public class CustomerServiceImplTest {
                 .setOrders(null);
 
         Mockito.when(customerRepository.findById(INPUT_ID)).thenReturn(Optional.of(customer));
-        Mockito.when(modelMapper.map(customer, CustomerDTO.class)).thenReturn(customerDTO);
+        Mockito.when(mapperUtil.map(customer, CustomerDTO.class)).thenReturn(customerDTO);
 
         CustomerDTO response = customerService.getCustomerById(INPUT_ID);
         Assert.assertEquals(customerDTO, response);
@@ -125,8 +129,9 @@ public class CustomerServiceImplTest {
                 .setOrders(null);
 
         Mockito.when(customerRepository.findByEmail(inputCustomerDTO.getEmail())).thenReturn(null);
+        Mockito.when(bCryptPasswordEncoder.encode(inputCustomerDTO.getPassword())).thenReturn("asda");
+        Mockito.when(mapperUtil.map(returnedCustomer, CustomerDTO.class)).thenReturn(returnedCustomerDTO);
         Mockito.when(customerRepository.save(savedCustomer)).thenReturn(returnedCustomer);
-        Mockito.when(modelMapper.map(returnedCustomer, CustomerDTO.class)).thenReturn(returnedCustomerDTO);
 
         CustomerDTO response = customerService.addCustomer(inputCustomerDTO);
         Assert.assertEquals(returnedCustomerDTO, response);

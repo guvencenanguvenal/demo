@@ -1,9 +1,9 @@
 package com.gcg.readingisgood.service;
 
 import com.gcg.readingisgood.model.dto.BookDTO;
-import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.model.repository.Book;
 import com.gcg.readingisgood.repository.BookRepository;
+import com.gcg.readingisgood.util.MapperUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -35,7 +34,7 @@ public class BookServiceImplTest {
     private BookRepository bookRepository;
 
     @Mock
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @Before
     public void before(){
@@ -85,9 +84,22 @@ public class BookServiceImplTest {
 
         Mockito.when(bookRepository.findByIsbn(ISBN)).thenReturn(updatedBook);
         Mockito.when(bookRepository.save(updatedBook)).thenReturn(updatedBook);
-        Mockito.when(modelMapper.map(updatedBook, BookDTO.class)).thenReturn(bookDTO);
+        Mockito.when(mapperUtil.map(updatedBook, BookDTO.class)).thenReturn(bookDTO);
 
         BookDTO response = bookService.updateStock(ISBN, STOCK);
+
+        Assert.assertEquals(bookDTO, response);
+    }
+
+    @Test
+    public void whenGetBookByIsbn_withValidIsbn_shouldReturnBookDTO(){
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO();
+
+        Mockito.when(bookRepository.findByIsbn(ISBN)).thenReturn(book);
+        Mockito.when(mapperUtil.map(book, BookDTO.class)).thenReturn(bookDTO);
+
+        BookDTO response = bookService.getBookByIsbn(ISBN);
 
         Assert.assertEquals(bookDTO, response);
     }
