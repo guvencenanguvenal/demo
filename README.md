@@ -1,23 +1,21 @@
 
 # reading-is-good
 
-# Getting Started
+## Getting Started
 
-## First of all
-
-    - Please first take a token before call services (http://localhost:8080/api/auth/token)
-    - There is one user for token (admin, admin)
+    - Please take a token before call services (http://localhost:8080/api/auth/token)
+    - There is one user for token (username = admin, password = admin)
     - There are 5 controller (Auth, Book, Order, Customer, Statistics)
     - You can check controller with Swagger (http://localhost:8080/swagger-ui/index.html)
-    - Postman requests json file already available
+    - Postman request's json file already available (GCG Getir Case Study.postman_collection.json)
 
 ## Tech Stack
 
     - docker compose (please check docker-compose.yml)
     - MongoDB 4.4 (because of my internet problem, it's not specific version.)
     - REST Api developed with Spring Boot.
-    - for Open API Swagger 3 (with default config)
-    - for Auth used JWT with Spring Security and jjwt. (it could be better)
+    - Open API Swagger 3 (with default config)
+    - Auth service JWT with Spring Security and jjwt.
     - mapping library ModelMapper (encupsulated with ModelUtil service)
     - MongoRepository
 
