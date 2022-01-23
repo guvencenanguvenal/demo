@@ -6,8 +6,8 @@ import com.gcg.readingisgood.model.dto.BookDTO;
 import com.gcg.readingisgood.model.repository.Book;
 import com.gcg.readingisgood.repository.BookRepository;
 import com.gcg.readingisgood.util.ExceptionUtil;
+import com.gcg.readingisgood.util.MapperUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class BookServiceImpl implements BookService {
 
     @Autowired
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @Autowired
     private BookRepository bookRepository;
@@ -31,8 +31,10 @@ public class BookServiceImpl implements BookService {
         Optional<Book> book = Optional.ofNullable(bookRepository.findByIsbn(isbn));
 
         if (book.isPresent()) {
-            return modelMapper.map(book.get(), BookDTO.class);
+            return mapperUtil.map(book.get(), BookDTO.class);
         }
+
+        log.error(isbn + " - book not found!");
 
         throw  ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.ENTITY_NOT_FOUND, isbn);
     }
@@ -42,10 +44,12 @@ public class BookServiceImpl implements BookService {
         Optional<List<Book>> books = Optional.ofNullable(bookRepository.findByIsbnIn(isbnList));
 
         if (books.isPresent()) {
-            return books.get().stream().map(element -> modelMapper.map(element, BookDTO.class)).collect(Collectors.toList());
+            return books.get().stream().map(element -> mapperUtil.map(element, BookDTO.class)).collect(Collectors.toList());
         }
 
-        throw  ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.ENTITY_NOT_FOUND, "");
+        log.error(isbnList.stream().map(Object::toString).collect(Collectors.joining("-")) + " - books not found!");
+
+        throw  ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.ENTITY_NOT_FOUND, isbnList.stream().map(Object::toString).collect(Collectors.joining("-")));
     }
 
     @Override
@@ -54,15 +58,21 @@ public class BookServiceImpl implements BookService {
         Optional<Book> book = Optional.ofNullable(bookRepository.findByIsbn(bookDTO.getIsbn()));
 
         if (!book.isPresent()) {
-             return modelMapper.map(
-                     bookRepository.save(new Book()
-                             .setName(bookDTO.getName())
-                             .setIsbn(bookDTO.getIsbn())
-                             .setWriter(bookDTO.getWriter())
-                             .setPrice(bookDTO.getPrice())
-                             .setStock(bookDTO.getStock())),
+
+            Book insertedBook = new Book()
+                    .setName(bookDTO.getName())
+                    .setIsbn(bookDTO.getIsbn())
+                    .setWriter(bookDTO.getWriter())
+                    .setPrice(bookDTO.getPrice())
+                    .setStock(bookDTO.getStock());
+
+            log.info(insertedBook.toString() + " - book added");
+
+             return mapperUtil.map(bookRepository.save(insertedBook),
                      BookDTO.class);
         }
+
+        log.error(bookDTO.toString() + " - book duplicate!");
 
         throw ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.DUPLICATE_ENTITY, bookDTO.getName());
 
@@ -78,8 +88,12 @@ public class BookServiceImpl implements BookService {
             Book updatedBook = book.get();
             updatedBook.setStock(stock);
 
-            return modelMapper.map(bookRepository.save(updatedBook), BookDTO.class);
+            log.info(updatedBook.toString() + " - book updated");
+
+            return mapperUtil.map(bookRepository.save(updatedBook), BookDTO.class);
         }
+
+        log.error(isbn + " - book not found!");
 
         throw  ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.ENTITY_NOT_FOUND, isbn);
     }
@@ -93,6 +107,8 @@ public class BookServiceImpl implements BookService {
         if (book.isPresent()) {
             return book.get().getStock() > 0;
         }
+
+        log.error(isbn + " - book not found!");
 
         throw  ExceptionUtil.throwException(EntityType.BOOK, ExceptionType.ENTITY_NOT_FOUND, isbn);
 

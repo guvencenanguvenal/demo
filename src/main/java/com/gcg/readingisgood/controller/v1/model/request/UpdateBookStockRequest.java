@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.validator.constraints.ISBN;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -14,6 +16,8 @@ import javax.validation.constraints.NotNull;
 public class UpdateBookStockRequest {
 
     @NotNull
+    @NotEmpty
+    //@ISBN
     private String isbn;
 
     @NotNull

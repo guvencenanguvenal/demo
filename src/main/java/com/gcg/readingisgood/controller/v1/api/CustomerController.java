@@ -8,15 +8,18 @@ import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.service.CustomerService;
 import com.gcg.readingisgood.service.OrderService;
 import com.gcg.readingisgood.util.ExceptionUtil;
-import org.modelmapper.ModelMapper;
+import com.gcg.readingisgood.util.MapperUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 
 @RestController
 @RequestMapping("/api/v1/customer")
+@Validated
 public class CustomerController {
 
     @Autowired
@@ -26,7 +29,7 @@ public class CustomerController {
     private OrderService orderService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @GetMapping("/all")
     public Response getAllUsers(@RequestParam(defaultValue = "0") Integer page,
@@ -35,17 +38,17 @@ public class CustomerController {
     }
 
     @GetMapping
-    public Response getUser(@Valid @NotNull @RequestParam(name = "email") String email){
+    public Response getUser(@Email @NotEmpty @RequestParam(name = "email") String email){
         return Response.ok().setPayload(customerService.getCustomerByEmail(email));
     }
 
     @PostMapping
     public Response saveUser(@Valid @RequestBody CreateCustomerRequest request) {
-        return Response.ok().setPayload(customerService.addCustomer(modelMapper.map(request, CustomerDTO.class)));
+        return Response.ok().setPayload(customerService.addCustomer(mapperUtil.map(request, CustomerDTO.class)));
     }
 
     @GetMapping("/order")
-    public Response getCustomerOrders(@Valid @NotNull @RequestParam(name = "email") String email) {
+    public Response getCustomerOrders(@Email @NotEmpty @RequestParam(name = "email") String email) {
 
         CustomerDTO customer = customerService.getCustomerByEmail(email);
 

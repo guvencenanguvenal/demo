@@ -1,10 +1,9 @@
 package com.gcg.readingisgood.service;
 
-import com.gcg.readingisgood.model.dto.CustomerDTO;
 import com.gcg.readingisgood.model.dto.OrderDTO;
 import com.gcg.readingisgood.model.repository.Order;
-import com.gcg.readingisgood.repository.BookRepository;
 import com.gcg.readingisgood.repository.OrderRepository;
+import com.gcg.readingisgood.util.MapperUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.modelmapper.ModelMapper;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -39,7 +37,7 @@ public class OrderServiceImplTest {
     private OrderRepository orderRepository;
 
     @Mock
-    private ModelMapper modelMapper;
+    private MapperUtil mapperUtil;
 
     @Before
     public void before(){
@@ -55,7 +53,7 @@ public class OrderServiceImplTest {
         OrderDTO orderDTO = new OrderDTO();
 
         Mockito.when(orderRepository.findAll()).thenReturn(orderList);
-        Mockito.when(modelMapper.map(order, OrderDTO.class)).thenReturn(orderDTO);
+        Mockito.when(mapperUtil.map(order, OrderDTO.class)).thenReturn(orderDTO);
 
         List<OrderDTO> response =  orderService.getAllOrders();
 
@@ -70,7 +68,7 @@ public class OrderServiceImplTest {
         OrderDTO orderDTO = new OrderDTO();
 
         Mockito.when(orderRepository.findById(INPUT_ID)).thenReturn(Optional.of(order));
-        Mockito.when(modelMapper.map(order, OrderDTO.class)).thenReturn(orderDTO);
+        Mockito.when(mapperUtil.map(order, OrderDTO.class)).thenReturn(orderDTO);
 
         OrderDTO response = orderService.getOrderById(INPUT_ID);
 
