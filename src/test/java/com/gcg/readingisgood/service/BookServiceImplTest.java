@@ -17,6 +17,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
@@ -102,6 +105,24 @@ public class BookServiceImplTest {
         BookDTO response = bookService.getBookByIsbn(ISBN);
 
         Assert.assertEquals(bookDTO, response);
+    }
+
+    @Test
+    public void whenGetAllBooksByIsbnList_withValidIsbnList_shouldReturnBookDTOList() {
+
+        List<String> isbnList = new ArrayList<>();
+
+        List<Book> bookList = new ArrayList<>();
+
+        Book book = new Book();
+        BookDTO bookDTO = new BookDTO();
+
+        Mockito.when(bookRepository.findByIsbnIn(isbnList)).thenReturn(bookList);
+        Mockito.when(mapperUtil.map(book, BookDTO.class)).thenReturn(bookDTO);
+
+        List<BookDTO> response = bookService.getAllBooksByIsbnList(isbnList);
+
+        Assert.assertEquals(new ArrayList<>(), response);
     }
 
 }
