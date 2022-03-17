@@ -7,7 +7,6 @@
     - There is one user for token (username = admin, password = admin)
     - There are 5 controller (Auth, Book, Order, Customer, Statistics)
     - You can check controller with Swagger (http://localhost:8080/swagger-ui/index.html)
-    - Postman request's json file already available (GCG Getir Case Study.postman_collection.json)
 
 ## Tech Stack
 
@@ -45,10 +44,6 @@ Expected Request
   "password": "admin"
 }
 ```
-
-## Postman
-
-    Postman export file's name is 'GCG Getir Case Study.postman_collection.json'
 
 ## Swagger
 
