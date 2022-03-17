@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   mongodb:
-    image: mongo:4.4
+    image: mongo:latest
     restart: always
     container_name: "mongodb"
     environment:
